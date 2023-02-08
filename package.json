@@ -21,8 +21,6 @@
     "prepublishOnly": "npm run compile"
   },
   "dependencies": {
-    "is-there": "^4.4.4",
-    "json5": "^2.1.1",
     "lodash": "^4.17.15"
   },
   "devDependencies": {

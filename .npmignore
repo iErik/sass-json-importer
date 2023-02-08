@@ -1,7 +1,5 @@
 /src
+/src_old
 /test
 .editorconfig
 .gitignore
-.jshintrc
-.travis.yml
-*.sublime*
