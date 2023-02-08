@@ -43,6 +43,24 @@ export default function(options = {}) {
   }
 }
 
+export function canonicalize(url) {
+  console.log(arguments);
+  if (!isJSONfile(url)) {
+    return null;
+  }
+
+  return new URL('file:' + path.resolve('./resources/config/' + url));
+}
+
+export function load(canonicalUrl) {
+    console.log('load');
+    console.log(arguments);
+    return {
+        contents: ``,
+        syntax: 'scss'
+    };
+}
+
 export function isJSONfile(url) {
   return /\.js(on5?)?$/.test(url);
 }

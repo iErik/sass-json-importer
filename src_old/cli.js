@@ -1,4 +1,4 @@
-import jsonImporter from './index';
+import jsonImporter from 'sass-json-importer/src_old';
 export default jsonImporter();
 
 // Super-hacky: Override Babel's transpiled export to provide both
