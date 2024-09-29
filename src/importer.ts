@@ -1,108 +1,183 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import _ from 'lodash';
+/* eslint-disable unicorn/no-null */
+import path from 'node:path';
+import { readFileSync, accessSync, constants } from 'node:fs';
 
+import { Importer, ImporterResult, CanonicalizeContext } from 'sass-embedded';
 
-interface ConvertOpts {
-    convertCase?: boolean
-}
 interface ImporterOptions {
-    loadPaths?: Array<string>
+	loadPaths?: string[];
+	convertCase?: boolean;
+	resolveWordPressInternals?: boolean;
 }
 
-export default class Importer
-{
-    protected options: ImporterOptions;
+type JsonValue = string | number | boolean | null;
+type JsonArray = (JsonValue | JsonObject)[];
+interface JsonObject {
+	[key: string]: JsonValue | JsonObject | JsonArray;
+}
 
-    constructor(options: ImporterOptions = {})
-    {
-        this.options = options;
-    }
+export default class JsonImporter implements Importer {
+	options: ImporterOptions;
+	nonCanonicalScheme = [
+		'http',
+		'https',
+		'data',
+		'blob',
+		'javascript',
+		'ssh',
+		'wss',
+	];
 
-    public canonicalize(url: string)
-    {
-        if (!this.isJSONfile(url)) {
-            return null;
-        }
+	constructor(options: ImporterOptions = {}) {
+		this.options = options;
+	}
 
-        if (this.options.loadPaths) {
-            for (let index = 0; index < this.options.loadPaths.length; index++) {
-                const possible = this.options.loadPaths[index];
-                const resolved = path.resolve(possible + '/' + url);
+	canonicalize(
+		url: string | null,
+		{ containingUrl }: CanonicalizeContext,
+	): URL | null {
+		if (url === null || !this.isJsonFile(url)) {
+			return null;
+		}
 
-                if (fs.existsSync(resolved)) {
-                    return new URL('file:' + resolved);
-                }
-            }
-        }
+		const loadPaths = new Set<string>();
 
-        return null;
-    }
+		// Add containingUrl directory if available
+		if (containingUrl?.pathname) {
+			loadPaths.add(path.dirname(containingUrl.pathname));
+		}
 
-    public load(url: URL)
-    {
-        let json: object = this.loadJSONfromPath(url.pathname);
-        let contents = this.transformJSONtoSass(json);
+		// Then, add items from this.options.loadPaths
+		for (const item of this.options.loadPaths ?? []) loadPaths.add(item);
 
-        return {
-            contents: contents,
-            syntax: 'scss'
-        };
-    }
+		for (const loadPath of loadPaths) {
+			try {
+				const resolved = path.resolve(loadPath, url);
+				accessSync(resolved, constants.R_OK);
+				return new URL(`file:${resolved}`);
+			} catch {
+				// If the file is not accessible, simply proceed to the next path
+			}
+		}
 
-    public isJSONfile(url: string) {
-        return /\.js(on5?)?$/.test(url);
-    }
+		return null;
+	}
 
-    protected loadJSONfromPath(path: string)
-    {
-        return JSON.parse(fs.readFileSync(path).toString());
-    }
+	load(canonicalUrl: URL): ImporterResult | null {
+		const jsonContent = this.loadJsonFromPath(canonicalUrl.pathname);
+		try {
+			const contents = this.transformJsonToSass(jsonContent);
 
-    protected transformJSONtoSass(json: object, opts: ConvertOpts = {}) {
-        return Object.keys(json)
-            .filter((key: string) => this.isValidKey(key))
-            .filter((key: string) => json[key as keyof object] !== '#')
-            .map((key:string) => `$${opts.convertCase ? this.toKebabCase(key) : key}: ${this.parseValue(json[key as keyof object], opts)};`)
-            .join('\n');
-    }
+			return {
+				contents: contents,
+				syntax: 'scss',
+				sourceMapUrl: canonicalUrl,
+			} as ImporterResult;
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : String(error);
+			throw new Error(`Failed to transform JSON: ${message}`);
+		}
+	}
 
-    protected isValidKey(key: string): boolean
-    {
-        return /^[^$@:].*/.test(key)
-    }
+	// isJsonFile = (url: string): boolean => /\.js(on5?)?$/.test(url);
+	isJsonFile = (url: string): boolean => url.endsWith('.json');
 
-    protected toKebabCase(key: string): string
-    {
-        return key
-            .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-            .replace(/([A-Z])([A-Z])(?=[a-z])/g, '$1-$2')
-            .toLowerCase();
-    }
+	protected ensureObject(
+		jsonContent: JsonObject,
+		pathname: string,
+	): JsonObject {
+		return Array.isArray(jsonContent)
+			? { [path.basename(pathname, path.extname(pathname))]: jsonContent }
+			: jsonContent;
+	}
 
-    protected parseValue(value: any, opts = {}): any
-    {
-        if (_.isArray(value)) {
-        return this.parseList(value, opts);
-        } else if (_.isPlainObject(value)) {
-        return this.parseMap(value, opts);
-        } else if (value === '') {
-        return '""'; // Return explicitly an empty string (Sass would otherwise throw an error as the variable is set to nothing)
-        } else {
-        return value;
-        }
-    }
+	protected loadJsonFromPath = (filePath: string): JsonObject => {
+		const fileContent = readFileSync(filePath, 'utf8');
+		let jsonContent;
+		try {
+			jsonContent = JSON.parse(fileContent) as JsonObject;
+			return this.ensureObject(jsonContent, filePath);
+		} catch {
+			throw new Error(`Failed to parse JSON from file: ${filePath}`);
+		}
+	};
 
-    protected parseList(list: Array<any>, opts = {}) {
-        return `(${list
-            .map((value: any) => this.parseValue(value))
-            .join(',')})`;
-    }
+	// WordPress theme.json uses colon in key names (':hover', ':focus', etc.), we need to allow for it.
+	protected isValidKey = (key: string): boolean => /^:?[^$:@]*$/.test(key);
 
-    protected parseMap(map: object, opts:ConvertOpts = {}) {
-        return `(${Object.keys(map)
-            .filter(key => this.isValidKey(key))
-            .map(key => `${opts.convertCase ? this.toKebabCase(key) : key}: ${this.parseValue(map[key as keyof object], opts)}`)
-            .join(',')})`;
-    }
+	protected isPlainObject = (value: JsonObject | JsonValue): boolean =>
+		value !== null && typeof value === 'object' && !Array.isArray(value);
+
+	protected toKebabCase(key: string): string {
+		return key
+			.replaceAll(/([\da-z])([A-Z])/g, '$1-$2')
+			.replaceAll(/([A-Z])([A-Z])(?=[a-z])/g, '$1-$2')
+			.toLowerCase();
+	}
+
+	private processKeys(
+		object: JsonObject,
+		formatter: (key: string, value: JsonObject | JsonValue) => string,
+	): string[] {
+		return Object.keys(object)
+			.filter((key) => this.isValidKey(key) && object[key] !== '#')
+			.map((key) => {
+				const convertedVariableName = this.options.convertCase
+					? this.toKebabCase(key)
+					: key;
+				return formatter(
+					convertedVariableName.replace(':', ''),
+					object[key] as JsonObject | JsonValue,
+				);
+			});
+	}
+
+	// Empty strings must be explicitly quoted. (Sass would otherwise throw an error as the variable is set to nothing.)
+	protected maybeQuoteStrings = (value: string): string =>
+		value === '' || /[$%*+,/:@|]/.test(value) ? `'${value}'` : value;
+
+	// Since WordPress 6.3.0, WP_Theme_JSON::resolve_variables resolves the internal link format to the CSS custom property.
+	// E.g., "var:preset|color|secondary" -> "var(--wp--preset--color--secondary)". This likewise converts those types of values.
+	protected resolveWordPressInternalLinks(value: string): string {
+		// Matches var:string|string(|string...)
+		const regex = /var:([\w-]+\|[\w-]+(\|[\w-]+)*)/g;
+
+		return regex.test(value)
+			? value.replaceAll(regex, (match) => {
+					const processed = match.slice(4).replaceAll('|', '--');
+					return `var(--wp--${processed})`;
+				})
+			: value;
+	}
+
+	protected transformJsonToSass(jsonContent: JsonObject) {
+		return this.processKeys(
+			jsonContent,
+			(key, value) => `$${key}: ${this.parseValue(value)};`,
+		).join('\n');
+	}
+
+	protected parseMap(jsonContent: JsonObject) {
+		return `(${this.processKeys(jsonContent, (key, value) => `${key}: ${this.parseValue(value)}`).join(',')})`;
+	}
+
+	protected parseList(list: JsonValue[]) {
+		return `(${list.map((value) => this.parseValue(value)).join(',')})`;
+	}
+
+	protected parseValue(value: JsonObject | JsonValue): string {
+		if (Array.isArray(value)) {
+			return this.parseList(value);
+		} else if (this.isPlainObject(value)) {
+			return this.parseMap(value as JsonObject);
+		}
+
+		// Convert numbers and booleans to string, and optionally resolve WordPress internal links.
+		const stringValue = value?.toString() ?? '';
+		const resolvedValue = this.options.resolveWordPressInternals
+			? this.resolveWordPressInternalLinks(stringValue)
+			: stringValue;
+		return this.maybeQuoteStrings(resolvedValue);
+	}
 }

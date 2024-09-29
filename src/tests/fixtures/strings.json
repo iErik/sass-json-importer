@@ -1,0 +1,6 @@
+{
+    "color-red" : "#c33"                   ,
+    "color-blue": "#33c"                   ,
+    "colorGreen": "#3c3"                   ,
+    "css"       : "&:hover { color: red; }"
+}

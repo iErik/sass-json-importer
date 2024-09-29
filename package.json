@@ -1,36 +1,57 @@
 {
-  "name": "sass-json-importer",
-  "version": "0.0.0-development",
-  "description": "Allows importing json in sass files parsed by sass/sass-embedded.",
-  "main": "dist/index.js",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/neild3r/sass-json-importer.git"
-  },
-  "keywords": [
-    "sass",
-    "sass-embedded",
-    "importer",
-    "json"
-  ],
-  "scripts": {
-    "test": "jest",
-    "watch": "tsc -watch",
-    "compile": "tsc",
-    "prepublishOnly": "npm run compile"
-  },
-  "dependencies": {
-    "lodash": "^4.17.15"
-  },
-  "devDependencies": {
-    "@tsconfig/node16": "^1.0.3",
-    "@types/jest": "^27.0.2",
-    "@types/lodash": "^4.14.191",
-    "@types/node": "^16.10.3",
-    "jest": "^27.2.5",
-    "ts-jest": "^27.0.5",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.3"
-  }
+    "name": "@blakedarlin/sass-json-importer",
+    "version": "1.0.0",
+    "description": "Allows importing JSON in Sass files parsed by sass/sass-embedded, with added support for WordPress.",
+    "type": "module",
+    "main": "./dist/index.js",
+    "license": "MIT",
+    "repository": "github:blakedarlin/sass-json-importer",
+    "keywords": [
+        "sass",
+        "sass-embedded",
+        "importer",
+        "json",
+        "wordpress"
+    ],
+    "author": {
+        "name": "Blake Darlin",
+        "email": "hello@blakedarlin.com",
+        "url": "https://blakedarlin.com"
+    },
+    "files": [
+        "./dist/index.js",
+        "./dist/importer.js"
+    ],
+    "scripts": {
+        "test": "jest",
+        "build": "tsc -p tsconfig.build.json",
+        "watch": "tsc -p tsconfig.build.json -watch",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "prepublishOnly": "npm run build"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.9.1",
+        "@jest/types": "^29.6.3",
+        "@swc/core": "^1.7.18",
+        "@swc/jest": "^0.2.36",
+        "@tsconfig/node20": "^20.1.4",
+        "@types/eslint": "^9",
+        "@types/eslint__js": "^8.42.3",
+        "@types/jest": "^29.5.12",
+        "@types/node": "^22.5.2",
+        "eslint": "^9.9.1",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jest": "^28.8.0",
+        "eslint-plugin-unicorn": "^55.0.0",
+        "globals": "^15.9.0",
+        "jest": "^29.7.0",
+        "prettier": "^3.3.3",
+        "sass-embedded": "^1.78.0",
+        "ts-jest": "^29.2.5",
+        "ts-jest-resolver": "^2.0.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.4",
+        "typescript-eslint": "^8.2.0"
+    },
+    "packageManager": "yarn@4.4.1"
 }

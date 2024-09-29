@@ -1,0 +1,10 @@
+{
+    "resolved-color-primary": "var(--wp--preset--color--primary)",
+    "color-primary": "var:preset|color|primary",
+    "font-size-x-small": "var:preset|font-size|x-small",
+    "padding": "var:preset|spacing|40 var:preset|spacing|60",
+    "padding-x": "var:preset|spacing|40",
+    "padding-y": "var:preset|spacing|60",
+    "custom-gap": "var:custom|gap",
+    "custom-control-border-color": "var:custom|control|border|color"
+}

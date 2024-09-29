@@ -1,8 +1,5 @@
-import Importer from './importer';
+import JsonImporter from './importer.js';
 
-function _default(config: Object)
-{
-    return new Importer(config);
+export default function getJsonImporter(config: object = {}) {
+	return new JsonImporter(config);
 }
-
-module.exports = _default;
