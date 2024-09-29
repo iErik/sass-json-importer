@@ -5,6 +5,7 @@ import {
 	Exception as SassException,
 } from 'sass-embedded';
 import { URL } from 'node:url';
+import { jest } from '@jest/globals';
 
 let compiler: AsyncCompiler;
 let jsonImporter: JsonImporter;
@@ -36,7 +37,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 
@@ -53,7 +54,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 
@@ -70,7 +71,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 });
@@ -107,7 +108,7 @@ describe('loadJsonFromPath - error if JSON-to-Sass transform fails', () => {
 
 		// Verify that an error is thrown with the correct message
 		expect(() => jsonImporter.load(mockUrl)).toThrow(
-			'Failed to transform JSON: Mock transformation error',
+			'Failed to load or transform JSON: Mock transformation error',
 		);
 	});
 
@@ -123,7 +124,7 @@ describe('loadJsonFromPath - error if JSON-to-Sass transform fails', () => {
 
 		// Verify that an error is thrown with the correct message
 		expect(() => jsonImporter.load(mockUrl)).toThrow(
-			'Failed to transform JSON: foo',
+			'Failed to load or transform JSON: foo',
 		);
 	});
 });

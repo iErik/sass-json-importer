@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+- Fix importing absolute file paths with special characters that would otherwise cause errors.
+- Fix Jest configuration.
+- Fix TypeScript configuration.
+- Add TypeScript types.
+
 ## 1.0.0
 - Refactor methods.
 - Remove lodash dependency.

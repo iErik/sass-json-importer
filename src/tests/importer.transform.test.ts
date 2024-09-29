@@ -35,7 +35,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 	it('throws an error when parsing unclosed brace', async () => {
@@ -51,7 +51,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 	it('throws an error when parsing an unquoted key', async () => {
@@ -67,7 +67,7 @@ describe('loadJsonFromPath - error on invalid JSON content', () => {
 		}
 
 		expect((caughtError as SassException).sassMessage).toContain(
-			'Failed to parse JSON from file',
+			'Failed to read or parse JSON from file',
 		);
 	});
 });

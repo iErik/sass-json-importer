@@ -1,5 +1,7 @@
 /* eslint-disable unicorn/no-null */
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { readFileSync, accessSync, constants } from 'node:fs';
 
 import { Importer, ImporterResult, CanonicalizeContext } from 'sass-embedded';
@@ -44,7 +46,8 @@ export default class JsonImporter implements Importer {
 
 		// Add containingUrl directory if available
 		if (containingUrl?.pathname) {
-			loadPaths.add(path.dirname(containingUrl.pathname));
+			const containingFilePath = fileURLToPath(containingUrl);
+			loadPaths.add(path.dirname(containingFilePath));
 		}
 
 		// Then, add items from this.options.loadPaths
@@ -54,7 +57,7 @@ export default class JsonImporter implements Importer {
 			try {
 				const resolved = path.resolve(loadPath, url);
 				accessSync(resolved, constants.R_OK);
-				return new URL(`file:${resolved}`);
+				return new URL(`file://${resolved}`);
 			} catch {
 				// If the file is not accessible, simply proceed to the next path
 			}
@@ -64,8 +67,9 @@ export default class JsonImporter implements Importer {
 	}
 
 	load(canonicalUrl: URL): ImporterResult | null {
-		const jsonContent = this.loadJsonFromPath(canonicalUrl.pathname);
 		try {
+			const filePath = fileURLToPath(canonicalUrl);
+			const jsonContent = this.loadJsonFromPath(filePath);
 			const contents = this.transformJsonToSass(jsonContent);
 
 			return {
@@ -76,7 +80,7 @@ export default class JsonImporter implements Importer {
 		} catch (error) {
 			const message =
 				error instanceof Error ? error.message : String(error);
-			throw new Error(`Failed to transform JSON: ${message}`);
+			throw new Error(`Failed to load or transform JSON: ${message}`);
 		}
 	}
 
@@ -93,13 +97,14 @@ export default class JsonImporter implements Importer {
 	}
 
 	protected loadJsonFromPath = (filePath: string): JsonObject => {
-		const fileContent = readFileSync(filePath, 'utf8');
-		let jsonContent;
 		try {
-			jsonContent = JSON.parse(fileContent) as JsonObject;
+			const fileContent = readFileSync(filePath, 'utf8');
+			const jsonContent = JSON.parse(fileContent) as JsonObject;
 			return this.ensureObject(jsonContent, filePath);
-		} catch {
-			throw new Error(`Failed to parse JSON from file: ${filePath}`);
+		} catch (error: unknown) {
+			throw new Error(
+				`Failed to read or parse JSON from file ${filePath}: ${String(error)}`,
+			);
 		}
 	};
 
