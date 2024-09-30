@@ -4,7 +4,11 @@ import { fileURLToPath } from 'node:url';
 
 import { readFileSync, accessSync, constants } from 'node:fs';
 
-import { Importer, ImporterResult, CanonicalizeContext } from 'sass-embedded';
+import type {
+	Importer,
+	ImporterResult,
+	CanonicalizeContext,
+} from 'sass-embedded';
 
 interface ImporterOptions {
 	loadPaths?: string[];
