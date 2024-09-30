@@ -7,12 +7,17 @@ export default {
 	trailingComma: 'all',
 	tabWidth: 4,
 	useTabs: true,
-	parser: 'typescript',
 	arrowParens: 'always',
 	requirePragma: false,
 	insertPragma: false,
 	endOfLine: 'lf',
 	overrides: [
+		{
+			files: ['*.ts', '*.tsx'],
+			options: {
+				parser: 'typescript',
+			},
+		},
 		{
 			files: '*.json',
 			options: {
