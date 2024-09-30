@@ -1,23 +1,23 @@
 {
-    "extends": "@tsconfig/node20/tsconfig.json",
-    "compilerOptions": {
-        "declaration": true,
-        "declarationMap": true,
-        "outDir": "./dist",
-        "baseUrl": "./src",
-        "paths": {
-            "@/*": ["*"]
-        },
-        "allowSyntheticDefaultImports": true,
-        "isolatedModules": true,
-        "resolveJsonModule": true,
-        "allowJs": true,
-        "forceConsistentCasingInFileNames": true,
-        "noFallthroughCasesInSwitch": true,
-        "removeComments": true,
-        "types": ["node", "jest"]
-    },
-    "compileOnSave": true,
-    "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "exclude": ["dist", "node_modules", ".yarn"]
+	"extends": "@tsconfig/node20/tsconfig.json",
+	"compilerOptions": {
+		"declaration": true,
+		"declarationMap": true,
+		"outDir": "./dist",
+		"baseUrl": "./src",
+		"paths": {
+			"@/*": ["*"]
+		},
+		"allowSyntheticDefaultImports": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"allowJs": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"removeComments": true,
+		"types": ["node", "jest"]
+	},
+	"compileOnSave": true,
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"exclude": ["dist", "node_modules", ".yarn"]
 }

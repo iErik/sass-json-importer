@@ -1,8 +1,9 @@
 # sass-json-importer
 
-JSON importer for [sass-embedded](https://github.com/sass/embedded-host-node). Allows  `@use`ing/`@import`ing `.json` files in Sass files parsed by `sass-embedded`, using the [Importer API](https://sass-lang.com/documentation/js-api/interfaces/importer/).
+JSON importer for [sass-embedded](https://github.com/sass/embedded-host-node). Allows `@use`ing/`@import`ing `.json` files in Sass files parsed by `sass-embedded`, using the [Importer API](https://sass-lang.com/documentation/js-api/interfaces/importer/).
 
 ## Usage
+
 ### [sass-embedded](https://github.com/sass/embedded-host-node)
 
 ```javascript
@@ -10,7 +11,7 @@ const sass = require('sass-embedded');
 const jsonImporter = require('@blakedarlin/sass-json-importer');
 
 const sassOptions = {
-	importers: [ jsonImporter() ],
+	importers: [jsonImporter()],
 };
 
 // Sync
@@ -30,7 +31,9 @@ The importer accepts a `loadPaths` option, which is a string array of absolute p
 
 ```javascript
 const result = sass.compile(scssFilename, {
-	importers: [ jsonImporter({ loadPaths: [ '/some/path', '/src/node_modules' ] }) ],
+	importers: [
+		jsonImporter({ loadPaths: ['/some/path', '/src/node_modules'] }),
+	],
 });
 ```
 
@@ -46,14 +49,14 @@ Whether to convert standard JavaScript camelCase keys into CSS/SCSS compliant ke
 
 ```json
 {
-	"bgBackgroundColor": 'red'
+	"bgBackgroundColor": "red"
 }
 ```
 
 `style.scss`:
 
 ```scss
-@import "variables.json";
+@import 'variables.json';
 
 div {
 	background: $bg-background-color;
@@ -64,7 +67,7 @@ To enable the `convertCase` option:
 
 ```javascript
 const result = sass.compile(scssFilename, {
-	importers: [ jsonImporter({ convertCase: true }) ],
+	importers: [jsonImporter({ convertCase: true })],
 });
 ```
 
@@ -80,9 +83,10 @@ Since WordPress 6.3.0, `WP_Theme_JSON::resolve_variables` resolves the internal 
 
 ```javascript
 const result = sass.compile(scssFilename, {
-	importers: [ jsonImporter({ resolveWordPressInternals: true }) ],
+	importers: [jsonImporter({ resolveWordPressInternals: true })],
 });
 ```
 
 ## Acknowledgements
+
 This module is based on the original [node-sass-json-importer](https://www.npmjs.com/package/node-sass-json-importer) and the [sass-json-importer](https://github.com/neild3r/sass-json-importer). Unfortunately, neither handles WordPress's theme.json file correctly.

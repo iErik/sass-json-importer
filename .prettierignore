@@ -1,0 +1,6 @@
+src/tests/fixtures/*.json
+src/tests/fixtures/*.json5
+dist
+coverage
+.yarn
+node_modules
