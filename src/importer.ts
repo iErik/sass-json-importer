@@ -10,6 +10,8 @@ import type {
 	CanonicalizeContext,
 } from 'sass-embedded';
 
+import JSONC from 'tiny-jsonc';
+
 interface ImporterOptions {
 	loadPaths?: string[];
 	convertCase?: boolean;
@@ -103,7 +105,7 @@ export default class JsonImporter implements Importer {
 	protected loadJsonFromPath = (filePath: string): JsonObject => {
 		try {
 			const fileContent = readFileSync(filePath, 'utf8');
-			const jsonContent = JSON.parse(fileContent) as JsonObject;
+			const jsonContent = JSONC.parse(fileContent) as JsonObject;
 			return this.ensureObject(jsonContent, filePath);
 		} catch (error: unknown) {
 			throw new Error(
