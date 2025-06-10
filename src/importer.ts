@@ -91,7 +91,7 @@ export default class JsonImporter implements Importer {
 	}
 
 	// isJsonFile = (url: string): boolean => /\.js(on5?)?$/.test(url);
-	isJsonFile = (url: string): boolean => url.endsWith('.json');
+	isJsonFile = (url: string): boolean => url.endsWith('.json') || url.endsWith('.jsonc');
 
 	protected ensureObject(
 		jsonContent: JsonObject,
