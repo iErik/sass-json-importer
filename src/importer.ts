@@ -14,6 +14,20 @@ interface ImporterOptions {
 	loadPaths?: string[];
 	convertCase?: boolean;
 	resolveWordPressInternals?: boolean;
+
+	/**
+	 * If `true`, will stringify sass map keys.
+	 *
+	 * In sass some values, such as color names (`red`), look like unquoted strings but are actually other types.
+	 *
+	 * When a key is not a string, it can only be accessed in a map by its value.
+	 *
+	 * Example: for a map: `$values: (red: #c33, beeYellow: #fdfd00)`
+	 *
+	 * - `map.get($values, red)` returns `#c33`
+	 * - `map.get($values, "red")` returns `null`
+	 */
+	stringifyKeys?: boolean;
 }
 
 type JsonValue = string | number | boolean | null;
@@ -168,7 +182,11 @@ export default class JsonImporter implements Importer {
 	}
 
 	protected parseMap(jsonContent: JsonObject) {
-		return `(${this.processKeys(jsonContent, (key, value) => `"${key}": ${this.parseValue(value)}`).join(',')})`;
+		return `(${this.processKeys(jsonContent, (key, value) => {
+			let mapKey = this.options.stringifyKeys ? `"${key}"` : key;
+
+			return `${mapKey}: ${this.parseValue(value)}`;
+		}).join(',')})`;
 	}
 
 	protected parseList(list: JsonValue[]) {
