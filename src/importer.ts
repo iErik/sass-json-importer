@@ -18,7 +18,7 @@ interface ImporterOptions {
 	/**
 	 * If `true`, will stringify sass map keys.
 	 *
-	 * In sass some values, such as color names (`red`), look like unquoted strings but are actually other types.
+	 * In sass some values, such as color names (e.g. `red`), look like unquoted strings but are actually other types.
 	 *
 	 * When a key is not a string, it can only be accessed in a map by its value.
 	 *
@@ -26,6 +26,11 @@ interface ImporterOptions {
 	 *
 	 * - `map.get($values, red)` returns `#c33`
 	 * - `map.get($values, "red")` returns `null`
+	 *
+	 * Because `red` is an html color.
+	 *
+	 * Both `map.get($values, beeYellow)` and `map.get($values, "beeYellow")` return `#fdfd00`.
+	 * Because `beeYellow` is not an html color.
 	 */
 	stringifyKeys?: boolean;
 }
