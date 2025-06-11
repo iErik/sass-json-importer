@@ -168,7 +168,7 @@ export default class JsonImporter implements Importer {
 	}
 
 	protected parseMap(jsonContent: JsonObject) {
-		return `(${this.processKeys(jsonContent, (key, value) => `${key}: ${this.parseValue(value)}`).join(',')})`;
+		return `(${this.processKeys(jsonContent, (key, value) => `"${key}": ${this.parseValue(value)}`).join(',')})`;
 	}
 
 	protected parseList(list: JsonValue[]) {
