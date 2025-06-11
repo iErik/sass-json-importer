@@ -30,11 +30,11 @@ describe('ImporterOptions - loadPaths', () => {
 
 	it('imports JSONC when passed a single, resolvable path', () => {
 		const jsonImporter = new JsonImporter({
-			loadPaths: [''],
+			loadPaths: ['./src/tests/fixtures'],
 		});
 		const sassOptions = { importers: [jsonImporter] };
 		const result = compileString(
-			'@import "src/tests/fixtures/strings.jsonc"; body { color: $color-red; }',
+			'@import "strings.jsonc"; body { color: $color-red; }',
 			sassOptions,
 		);
 
