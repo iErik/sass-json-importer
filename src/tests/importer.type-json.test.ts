@@ -64,9 +64,10 @@ describe('Import type test (JSON)', () => {
 
 	it('imports maps', async () => {
 		const result = await compiler.compileStringAsync(
-			`@use 'sass:map'; @import "maps.json"; body { color: map.get($colors, red); }`,
+			`@use 'sass:map'; @import "maps.json"; body { color: map.get($colors, "red"); }`,
 			sassOptions,
 		);
+
 		expect(result.css.toString()).toContain(expectedResult);
 	});
 
