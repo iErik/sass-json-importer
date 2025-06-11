@@ -87,6 +87,41 @@ const result = sass.compile(scssFilename, {
 });
 ```
 
+## Stringify keys in a map
+
+By default, in a map all keys are imported unstringified.
+
+A json file:
+
+```json
+{
+	"red": "#c33",
+	"bee-yellow": "#fdfd00"
+}
+```
+
+will be imported as scss:
+
+```scss
+$colors: (
+	red: #c33,
+	beeYellow: #fdfd00,
+);
+```
+
+In the scss map above `red` is a color, while `beeYellow` is a string.
+
+`stringifyKeys: true` can be used to stringify all keys in a map.
+
+When `stringifyKeys: true`, the following scss map will be imported for the json example from above:
+
+```scss
+$colors: (
+	'red': #c33,
+	'beeYellow': #fdfd00,
+);
+```
+
 ## Acknowledgements
 
 This module is based on the original [node-sass-json-importer](https://www.npmjs.com/package/node-sass-json-importer) and the [sass-json-importer](https://github.com/neild3r/sass-json-importer). Unfortunately, neither handles WordPress's theme.json file correctly.
