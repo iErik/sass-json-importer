@@ -16,6 +16,7 @@ interface ImporterOptions {
 	loadPaths?: string[];
 	convertCase?: boolean;
 	resolveWordPressInternals?: boolean;
+	stringifyKeys?: boolean;
 }
 
 type JsonValue = string | number | boolean | null;
@@ -171,7 +172,11 @@ export default class JsonImporter implements Importer {
 	}
 
 	protected parseMap(jsonContent: JsonObject) {
-		return `(${this.processKeys(jsonContent, (key, value) => `${key}: ${this.parseValue(value)}`).join(',')})`;
+		return `(${this.processKeys(jsonContent, (key, value) => {
+			let mapKey = this.options.stringifyKeys ? `"${key}"` : key;
+
+			return `${mapKey}: ${this.parseValue(value)}`;
+		}).join(',')})`;
 	}
 
 	protected parseList(list: JsonValue[]) {
