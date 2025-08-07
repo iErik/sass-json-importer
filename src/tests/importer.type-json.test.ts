@@ -70,6 +70,24 @@ describe('Import type test (JSON)', () => {
 		expect(result.css.toString()).toContain(expectedResult);
 	});
 
+	it('with stringifyKeys: true, imports maps with quoted keys', async () => {
+		let jsonImporter = new JsonImporter({
+			loadPaths: ['./src/tests/fixtures'],
+			stringifyKeys: true,
+		});
+
+		let options = {
+			importers: [jsonImporter],
+		};
+
+		const result = await compiler.compileStringAsync(
+			`@use 'sass:map'; @import "maps.json"; body { color: map.get($colors, "red"); }`,
+			options,
+		);
+
+		expect(result.css.toString()).toContain(expectedResult);
+	});
+
 	it('imports maps with array as top level', async () => {
 		const result = await compiler.compileStringAsync(
 			`@use 'sass:list'; @import "array.json"; body { color: list.nth($array, 1); }`,
