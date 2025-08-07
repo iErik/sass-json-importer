@@ -15,6 +15,10 @@ describe('isJsonFile - checks if a file path has a valid JSON extension', () => 
 		// expect(jsonImporter.isJsonFile('file.js')).toBe(true);
 	});
 
+	it('should return true for .jsonc files', () => {
+		expect(jsonImporter.isJsonFile('file.jsonc')).toBe(true);
+	});
+
 	it('should return false for .json5/.js files', () => {
 		expect(jsonImporter.isJsonFile('file.json5')).toBe(false);
 		expect(jsonImporter.isJsonFile('file.js')).toBe(false);

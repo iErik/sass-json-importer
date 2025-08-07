@@ -28,6 +28,19 @@ describe('ImporterOptions - loadPaths', () => {
 		expect(result.css.toString()).toContain('color: #c33;');
 	});
 
+	it('imports JSONC when passed a single, resolvable path', () => {
+		const jsonImporter = new JsonImporter({
+			loadPaths: ['./src/tests/fixtures'],
+		});
+		const sassOptions = { importers: [jsonImporter] };
+		const result = compileString(
+			'@import "strings.jsonc"; body { color: $color-red; }',
+			sassOptions,
+		);
+
+		expect(result.css.toString()).toContain('color: #c33;');
+	});
+
 	it('imports JSON when passed resolvable and non-resolvable paths', () => {
 		const jsonImporter = new JsonImporter({
 			loadPaths: ['./foo', './bar', './src/tests/fixtures'],
